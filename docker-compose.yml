@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    # Used by `docker compose watch`: source changes are copied into the running
+    # container (PHP picks them up on the next request, no restart needed), while
+    # dependency or image changes trigger a rebuild.
+    develop:
+      watch:
+        - action: sync
+          path: ./app
+          target: /var/www/html/app
+        - action: sync
+          path: ./config
+          target: /var/www/html/config
+        - action: sync
+          path: ./routes
+          target: /var/www/html/routes
+        - action: sync
+          path: ./resources
+          target: /var/www/html/resources
+        - action: sync
+          path: ./database
+          target: /var/www/html/database
+        - action: sync
+          path: ./public
+          target: /var/www/html/public
+        - action: sync
+          path: ./tests
+          target: /var/www/html/tests
+        - action: rebuild
+          path: ./composer.json
+        - action: rebuild
+          path: ./composer.lock
+        - action: rebuild
+          path: ./Dockerfile
