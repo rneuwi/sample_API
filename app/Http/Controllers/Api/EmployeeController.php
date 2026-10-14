@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\EmployeeIdRequest;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Services\EmployeeService;
@@ -25,7 +26,7 @@ class EmployeeController extends Controller
     /**
      * GET /api/employees/{employee}
      */
-    public function show(int $employee): EmployeeResource
+    public function show(EmployeeIdRequest $request, int $employee): EmployeeResource
     {
         return new EmployeeResource($this->employees->get($employee));
     }
@@ -46,7 +47,7 @@ class EmployeeController extends Controller
     /**
      * DELETE /api/employees/{employee}
      */
-    public function destroy(int $employee): Response
+    public function destroy(EmployeeIdRequest $request, int $employee): Response
     {
         $this->employees->delete($employee);
 

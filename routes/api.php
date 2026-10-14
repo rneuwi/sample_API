@@ -13,12 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// IDs must be positive integers without leading zeros, capped at 18 digits so
-// they always fit in a PHP int. Anything else returns 404 before reaching the
-// controller.
+// The {employee} ID is validated by App\Http\Requests\EmployeeIdRequest.
 Route::apiResource('employees', EmployeeController::class)
-    ->only(['index', 'show', 'store', 'destroy'])
-    ->where(['employee' => '[1-9][0-9]{0,17}']);
+    ->only(['index', 'show', 'store', 'destroy']);
 
 // Future: add 'update' to the only() list above to expose
 // PUT/PATCH /api/employees/{employee} once EmployeeController::update() exists.

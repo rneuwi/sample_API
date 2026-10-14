@@ -279,7 +279,7 @@ Dockerfile, docker-compose.yml                    Container setup (run, test, wa
 - **Plain entity instead of an Eloquent model.** There is no database, so `Employee` is a small `readonly` class in `app/Entities` rather than a model in `app/Models`. That avoids implying Eloquent behavior that doesn't exist.
 - **Laravel-native validation.** A `FormRequest` handles validation, so failures produce Laravel's standard 422 response automatically. Email uniqueness is checked by a custom `ValidationRule` that asks the repository, because the built-in `unique` rule requires a database.
 - **Domain exception for "not found".** The service throws `EmployeeNotFoundException`, which renders its own 404 JSON response. This keeps not-found handling consistent for both `show` and `destroy` without `if` checks in the controller.
-- **Route constraints.** The `{employee}` parameter only matches positive integers without leading zeros, up to 18 digits so the value always fits in a PHP integer. Anything else (`abc`, `0`, `-1`, `001`, oversized numbers) returns 404 at the routing layer, before reaching the controller.
+- **ID validation in a FormRequest.** Validation belongs to the HTTP layer, not the route definitions, so `EmployeeIdRequest` validates the `{employee}` parameter for `show` and `destroy`. It accepts only positive integers without leading zeros, up to 18 digits so the value always fits in a PHP integer. Anything else (`abc`, `0`, `-1`, `001`, oversized numbers) returns 404 before the controller action runs, because a malformed ID can never identify an employee.
 - **Malformed JSON gets a 400.** `StoreEmployeeRequest` rejects an unparseable JSON body with `400 Bad Request`. Otherwise Laravel would treat the body as empty and report every field as missing, which hides the real problem.
 - **REST conventions.** `Route::apiResource(...)->only([...])` exposes exactly the four required operations. `POST` returns `201` with a `Location` header, and `DELETE` returns `204` with no body.
 
@@ -396,5 +396,5 @@ Notes:
 
 ## Possible extensions
 
-- **Update endpoint.** Add `update` to the `only([...])` list in `routes/api.php`, then add an `UpdateEmployeeRequest`, `EmployeeController::update()`, `EmployeeService::update()` and `EmployeeRepositoryInterface::update()`. Placeholder comments mark each of these spots in the code.
+- **Update endpoint.** Add `update` to the `only([...])` list in `routes/api.php`, then add an `UpdateEmployeeRequest` (which also needs `EmployeeIdRequest`'s ID rule), `EmployeeController::update()`, `EmployeeService::update()` and `EmployeeRepositoryInterface::update()`. Placeholder comments mark each of these spots in the code.
 - Pagination for the list endpoint once the data set grows.
